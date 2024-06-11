@@ -4,14 +4,12 @@ import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { groupByCategory } from "@/utils/groupByCategory";
 import { useBudget } from "@/contexts/BudgetContext";
+import { chartCurrencyTooltip } from "@/utils/global";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const MonthlyExpensesChart: React.FC = () => {
-  const {
-		budgetItems
-	 } = useBudget();
-
+const MonthExpensesChart: React.FC = () => {
+  const { budgetItems } = useBudget();
   // Group and sum data by description
   const groupedData = groupByCategory(budgetItems);
   const labels = Object.keys(groupedData);
@@ -21,7 +19,7 @@ const MonthlyExpensesChart: React.FC = () => {
     labels,
     datasets: [
       {
-        label: 'Expenses',
+        label: 'Total',
         data: dataValues,
         backgroundColor: [
           'rgba(255, 99, 132, 0.2)',
@@ -45,8 +43,8 @@ const MonthlyExpensesChart: React.FC = () => {
   };
 
   return (
-    <Pie data={data} />
+    <Pie data={data} options={chartCurrencyTooltip} />
   );
 };
 
-export default MonthlyExpensesChart;
+export default MonthExpensesChart;

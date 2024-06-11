@@ -28,10 +28,11 @@ const BudgetItemsHome: React.FC = () => {
 
     return (
         <>
-            <div className="mb-10">
-                <DateSelectTitle title="Items">
+            <div className="h-full flex flex-col items-center p-4 mb-10">
+                <div className="w-full max-w-screen-md">
+                    <DateSelectTitle title="Items"/>
                     <BudgetList onItemClick={onItemClick} />
-                </DateSelectTitle>
+                </div>
             </div>
             <button className="btn btn-accent shadow-lg fixed bottom-5 right-5" onClick={showForm}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -1,8 +1,9 @@
 // src/components/BudgetForm.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import { useBudget } from "@/contexts/BudgetContext";
 import { BudgetEditItem, BudgetItem } from "@/types";
+import { useConstant } from "@/contexts/ConstantContext";
 
 interface BudgetFormProps {
     isFormOpen: boolean
@@ -11,6 +12,8 @@ interface BudgetFormProps {
 
 const BudgetForm: React.FC<BudgetFormProps> = ({ isFormOpen, onComplete }) => {
     const { processForm, editingItem } = useBudget();
+    const { CATEGORIES: categories } = useConstant();
+
     const [category, setCategory] = useState('');
     const [amount, setAmount] = useState<number | ''>('');
     const [date, setDate] = useState<string>(moment().format('YYYY-MM-DD'));
@@ -51,7 +54,11 @@ const BudgetForm: React.FC<BudgetFormProps> = ({ isFormOpen, onComplete }) => {
         setDate(moment().format('YYYY-MM-DD'));
     }
 
-    React.useEffect(() => {
+    useEffect(() => {
+        setCategory(categories[0])
+    }, [categories.length])
+
+    useEffect(() => {
         if (editingItem != undefined) {
             setCategory((editingItem as BudgetItem).category);
             setAmount((editingItem as BudgetItem).amount);
@@ -59,7 +66,7 @@ const BudgetForm: React.FC<BudgetFormProps> = ({ isFormOpen, onComplete }) => {
         }
     }, [editingItem]);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (!isFormOpen) {
             resetForm();
         }
@@ -68,41 +75,53 @@ const BudgetForm: React.FC<BudgetFormProps> = ({ isFormOpen, onComplete }) => {
     return (
         <form onSubmit={handleSubmit} className="p-2">
             <div className="flex flex-col md:flex-row gap-2 mb-2">
-                <label className="input input-bordered flex items-center gap-2">
-                    <span className="text-gray-400">Category</span>
-                    <input
-                        type="text"
-                        id="category"
-                        className="grow md:flex-1"
-                        placeholder="e.g Lunch"
+                <label className="form-control flex-1">
+                    <div className="label">
+                        <div className="label-text">Category</div>
+                    </div>
+                    <select
+                        className="select select-bordered w-full max-w-xs"
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
                         required
-                    />
+                    >
+                        {
+                            categories.map((cat: string, index: number) =>
+                                <option key={`${cat}_${index}`} value={cat}>{cat}</option>
+                            )
+                        }
+                    </select>
                 </label>
-                <label className="input input-bordered flex items-center gap-2">
-                    <span className="text-gray-400">Amount</span>
+                <label className="form-control flex-1">
+                    <div className="label">
+                        <div className="label-text text-gray-400">Amount</div>
+                    </div>
                     <input
                         type="number"
                         inputMode="decimal"
                         id="amount"
-                        className="grow md:flex-1"
+                        className="input input-bordered grow md:flex-1"
                         placeholder="e.g. 6.5"
                         value={amount}
                         onChange={(e) => setAmount(Number(e.target.value))}
                         required
                     />
                 </label>
-                <input
-                    disabled={editingItem != undefined}
-                    type="date"
-                    id="date"
-                    className="input input-bordered md:flex-1"
-                    placeholder="Date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    required
-                />
+                <label className="form-control flex-1">
+                    <div className="label">
+                        <div className="label-text text-gray-400">Date</div>
+                    </div>
+                    <input
+                        disabled={editingItem != undefined}
+                        type="date"
+                        id="date"
+                        className="input input-bordered md:flex-1"
+                        placeholder="Date"
+                        value={date}
+                        onChange={(e) => setDate(e.target.value)}
+                        required
+                    />
+                </label>
             </div>
             <div className="w-full flex justify-end">
                 <button type="submit" className="btn btn-success text-white shadow-md">

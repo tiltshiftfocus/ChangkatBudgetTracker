@@ -1,10 +1,11 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { BudgetEditItem, BudgetItem, BudgetItemsOverview } from "@/types";
-import { ADD_EXPENSE_URL, EDIT_EXPENSE_URL, GET_EXPENSE_URL } from "@/constants/apis";
 import moment from "moment";
 import { sortBy } from "@/utils/global";
+import { useConstant } from "./ConstantContext";
 
 interface BudgetContextType {
+    isLoading: boolean
     selectedYearMonth: string
     budgetItems: BudgetItem[]
     budgetOverview: BudgetItemsOverview[]
@@ -18,6 +19,9 @@ interface BudgetContextType {
 const BudgetContext = createContext<BudgetContextType | undefined>(undefined);
 
 export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+    const { API_URL, GET_EXPENSE_API, EDIT_EXPENSE_API, ADD_EXPENSE_API } = useConstant();
+
+    const [isLoading, setIsLoading] = useState(true);
     const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([]);
     const [budgetOverview, setBudgetOverview] = useState<BudgetItemsOverview[]>([]);
     const [selectedYearMonth, setSelectedYearMonth] = useState(moment().format('YYYY-MM'));
@@ -26,10 +30,11 @@ export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
     const loadData = (yearMonth?: string) => {
         return new Promise<void>((resolve, _) => {
+            setIsLoading(true);
             if (yearMonth == null) {
                 yearMonth = selectedYearMonth
             }
-            fetch(`${GET_EXPENSE_URL}?date=${moment(yearMonth, 'YYYY-MM').format('YYYY-MM-01')}`)
+            fetch(`${API_URL}/${GET_EXPENSE_API}?date=${moment(yearMonth, 'YYYY-MM').format('YYYY-MM-01')}`)
             .then(res => res.json())
             .then((data: any) => {
                 data = data.map((d: any) => {
@@ -41,17 +46,22 @@ export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     
                 setBudgetItems([...data]);
                 setBudgetOverview([...overview]);
+                setIsLoading(false);
                 resolve();
             })
         })
     }
 
     useEffect(() => {
-        loadData();
-    }, []);
+        if (API_URL != '') {
+            loadData();
+        }
+    }, [API_URL]);
 
     useEffect(() => {
-        loadData(selectedYearMonth);
+        if (API_URL != '') {
+            loadData(selectedYearMonth);
+        }
     }, [selectedYearMonth]);
 
     const addBudgetItem = (item: BudgetItem) => {
@@ -62,7 +72,7 @@ export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             const headers = {
                 'Content-Type': 'application/json'
             }
-            fetch(ADD_EXPENSE_URL, { headers, method: 'POST', body: JSON.stringify(postItem) })
+            fetch(`${API_URL}/${ADD_EXPENSE_API}`, { headers, method: 'POST', body: JSON.stringify(postItem) })
             .then(res => res.json())
             .then(result => {
                 if (result['ResponseMetadata']['HTTPStatusCode'] == 200) {
@@ -80,7 +90,7 @@ export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             const headers = {
                 'Content-Type': 'application/json'
             }
-            fetch(EDIT_EXPENSE_URL, { headers, method: 'POST', body: JSON.stringify(postItem) })
+            fetch(`${API_URL}/${EDIT_EXPENSE_API}`, { headers, method: 'POST', body: JSON.stringify(postItem) })
             .then(res => res.json())
             .then(result => {
                 if (result['ResponseMetadata']['HTTPStatusCode'] == 200) {
@@ -122,6 +132,7 @@ export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
     return (
         <BudgetContext.Provider value={{
+            isLoading: isLoading,
             selectedYearMonth,
             budgetItems,
             budgetOverview,

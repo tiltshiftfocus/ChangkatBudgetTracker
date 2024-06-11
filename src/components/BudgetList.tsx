@@ -10,6 +10,7 @@ interface BudgetListProps {
 
 const BudgetList: React.FC<BudgetListProps> = ({ onItemClick }) => {
 	const {
+		isLoading,
 		budgetOverview,
 	} = useBudget();
 
@@ -17,13 +18,13 @@ const BudgetList: React.FC<BudgetListProps> = ({ onItemClick }) => {
 		<>
 			<div className="border border-blue-800 border-opacity-30 rounded-lg p-3 shadow-md bg-white dark:bg-gray-800">
 				{
-					budgetOverview.length == 0 &&
+					!isLoading && budgetOverview.length == 0 &&
 					<div className="flex justify-center">
 						<h4>No Records</h4>
 					</div>
 				}
 				{
-					budgetOverview.length > 0 && budgetOverview.map((budgetGroup: BudgetItemsOverview, index: number) => (
+					!isLoading && budgetOverview.length > 0 && budgetOverview.map((budgetGroup: BudgetItemsOverview, index: number) => (
 						<React.Fragment key={`overview_${index}`}>
 							<div tabIndex={index} className="collapse-open">
 								<div className="collapse-title font-bold">
@@ -51,6 +52,10 @@ const BudgetList: React.FC<BudgetListProps> = ({ onItemClick }) => {
 							}
 						</React.Fragment>
 					))
+				}
+				{
+					isLoading &&
+					<div className="flex justify-center"><span className="loading loading-spinner loading-md"></span></div>
 				}
 			</div>
 			{/* <ul className="list-none p-4 overflow-auto">

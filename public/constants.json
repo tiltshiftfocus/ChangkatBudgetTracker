@@ -1,0 +1,11 @@
+{
+    "API_URL": "",
+    "GET_EXPENSE_API": "ChangkatBudgetingMonthlyExpense",
+    "ADD_EXPENSE_API": "ChangkatBudgetingAddExpense",
+    "EDIT_EXPENSE_API": "ChangkatBudgetingEditExpense",
+    "CATEGORIES": [
+        "Breakfast",
+        "Lunch",
+        "Dinner"
+    ]
+}
