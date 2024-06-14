@@ -19,7 +19,7 @@ interface BudgetContextType {
 const BudgetContext = createContext<BudgetContextType | undefined>(undefined);
 
 export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const { API_URL, GET_EXPENSE_API, EDIT_EXPENSE_API, ADD_EXPENSE_API } = useConstant();
+    const { API_URL, CURRENT_USER, GET_EXPENSE_API, EDIT_EXPENSE_API, ADD_EXPENSE_API } = useConstant();
 
     const [isLoading, setIsLoading] = useState(true);
     const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([]);
@@ -34,7 +34,7 @@ export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             if (yearMonth == null) {
                 yearMonth = selectedYearMonth
             }
-            fetch(`${API_URL}/${GET_EXPENSE_API}?date=${moment(yearMonth, 'YYYY-MM').format('YYYY-MM-01')}`)
+            fetch(`${API_URL}/${GET_EXPENSE_API}?date=${moment(yearMonth, 'YYYY-MM').format('YYYY-MM-01')}&userID=${CURRENT_USER}`)
             .then(res => res.json())
             .then((data: any) => {
                 data = data.map((d: any) => {
@@ -67,6 +67,7 @@ export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     const addBudgetItem = (item: BudgetItem) => {
         return new Promise<void>((resolve, _) => {
             const postItem = JSON.parse(JSON.stringify(item));
+            postItem['userID'] = CURRENT_USER;
             postItem['amount'] = `${postItem['amount']}`;
     
             const headers = {
@@ -86,7 +87,9 @@ export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     const editBudgetItem = (item: BudgetEditItem) => {
         return new Promise<void>((resolve, _) => {
             const postItem = JSON.parse(JSON.stringify(item));
+            postItem['userID'] = CURRENT_USER;
             postItem['amount'] = `${postItem['amount']}`;
+
             const headers = {
                 'Content-Type': 'application/json'
             }

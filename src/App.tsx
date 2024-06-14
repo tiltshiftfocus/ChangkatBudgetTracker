@@ -20,7 +20,7 @@ const App = () => {
 	// 	}
 	// }, [])
 
-	if (API_URL != '') {
+	if (useConstant() != undefined && API_URL != '') {
 		return (
 			<Router>
 				<div className="h-screen flex flex-col bg-gray-200 dark:bg-gray-800">
@@ -39,6 +39,12 @@ const App = () => {
 					</div>
 				</div>
 			</Router>
+		)
+	} else if (useConstant() != undefined && API_URL == '') {
+		return (
+			<div className="flex justify-center">
+				<span className="font-bold">[ERROR] No API available</span>
+			</div>
 		)
 	} else {
 		return (

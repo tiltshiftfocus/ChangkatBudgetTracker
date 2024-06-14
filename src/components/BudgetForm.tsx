@@ -12,23 +12,23 @@ interface BudgetFormProps {
 
 const BudgetForm: React.FC<BudgetFormProps> = ({ isFormOpen, onComplete }) => {
     const { processForm, editingItem } = useBudget();
-    const { CATEGORIES: categories } = useConstant();
+    const { CURRENT_USER, CATEGORIES: categories } = useConstant();
 
-    const [category, setCategory] = useState('');
+    const [category, setCategory] = useState(categories[0]);
     const [amount, setAmount] = useState<number | ''>('');
     const [date, setDate] = useState<string>(moment().format('YYYY-MM-DD'));
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (category && amount) {
+        if (category && amount.toString()) {
             // create mode
             let data: BudgetItem | BudgetEditItem = {
                 id: Date.now(),
                 category: category,
                 amount: Number(amount),
                 date,
-                userID: 'gy',
-                expenseID: `${moment().unix()}-gy`
+                userID: CURRENT_USER,
+                expenseID: `${moment().unix()}-${CURRENT_USER}`
             };
             
             // edit mode: replace `data`
@@ -49,14 +49,10 @@ const BudgetForm: React.FC<BudgetFormProps> = ({ isFormOpen, onComplete }) => {
     };
 
     const resetForm = () => {
-        setCategory('');
+        setCategory(categories[0]);
         setAmount('');
         setDate(moment().format('YYYY-MM-DD'));
     }
-
-    useEffect(() => {
-        setCategory(categories[0])
-    }, [categories.length])
 
     useEffect(() => {
         if (editingItem != undefined) {

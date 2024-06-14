@@ -16,7 +16,7 @@ const BudgetList: React.FC<BudgetListProps> = ({ onItemClick }) => {
 
 	return (
 		<>
-			<div className="border border-blue-800 border-opacity-30 rounded-lg p-3 shadow-md bg-white dark:bg-gray-800">
+			<div className="border border-blue-800 border-opacity-30 rounded-lg p-3 shadow-md bg-white dark:bg-gray-800 mb-24">
 				{
 					!isLoading && budgetOverview.length == 0 &&
 					<div className="flex justify-center">

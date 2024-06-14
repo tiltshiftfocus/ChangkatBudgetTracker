@@ -1,7 +1,9 @@
+import { useWebApp } from "@vkruglikov/react-telegram-web-app"
 import { ReactNode, createContext, useContext, useEffect, useState } from "react"
 
 interface ConstantContextType {
     API_URL: string
+    CURRENT_USER: string
     GET_EXPENSE_API: string
     ADD_EXPENSE_API: string
     EDIT_EXPENSE_API: string
@@ -11,8 +13,11 @@ interface ConstantContextType {
 const ConstantContext = createContext<ConstantContextType | undefined>(undefined);
 
 export const ConstantProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+    const { initDataUnsafe } = useWebApp();
+
     const [ consts, setConsts ] = useState<ConstantContextType>({
         API_URL: '',
+        CURRENT_USER: 'test_user_1',
         GET_EXPENSE_API: '',
         ADD_EXPENSE_API: '',
         EDIT_EXPENSE_API: '',
@@ -20,9 +25,14 @@ export const ConstantProvider: React.FC<{ children: ReactNode }> = ({ children }
     });
 
     useEffect(() => {
-        fetch('/constants.json')
+        fetch(import.meta.env.VITE_CONSTANTS_FILE)
         .then(res => res.json())
-        .then((res: ConstantContextType) => setConsts({...res}));
+        .then((res: ConstantContextType) => {
+            setConsts({...res});
+            if (Object.keys(initDataUnsafe).length > 0) {
+                setConsts(prev => ({ ...prev, CURRENT_USER: initDataUnsafe['user']['id'] }))
+            }
+        });
     }, []);
 
     return (

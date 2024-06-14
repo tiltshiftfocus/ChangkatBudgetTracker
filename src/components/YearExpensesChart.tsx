@@ -12,12 +12,13 @@ interface YearExpensesChartProps {
 }
 
 const YearExpensesChart: React.FC<YearExpensesChartProps> = ({ date }) => {
-    const { API_URL, GET_EXPENSE_API } = useConstant();
+    const { API_URL, CURRENT_USER, GET_EXPENSE_API } = useConstant();
+    
     const [chartData, setChartData] = useState<any>({});
     const months = Array.from({ length: 12 }, (_, i) => new Date(0, i).toLocaleString('default', { month: 'long' }));
 
     const updateChart = () => {
-        fetch(`${API_URL}/${GET_EXPENSE_API}?date=${date}&sort_type=year`)
+        fetch(`${API_URL}/${GET_EXPENSE_API}?date=${date}&sort_type=year&userID=${CURRENT_USER}`)
         .then(res => res.json())
         .then((items: any) => {
             const yearExpenses = new Array(12).fill(0);
