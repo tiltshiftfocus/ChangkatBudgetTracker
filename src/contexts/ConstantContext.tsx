@@ -7,6 +7,8 @@ interface ConstantContextType {
     GET_EXPENSE_API: string
     ADD_EXPENSE_API: string
     EDIT_EXPENSE_API: string
+    GET_LIMIT_API: string
+    EDIT_LIMIT_API: string
     CATEGORIES: string[]
 }
 
@@ -21,6 +23,8 @@ export const ConstantProvider: React.FC<{ children: ReactNode }> = ({ children }
         GET_EXPENSE_API: '',
         ADD_EXPENSE_API: '',
         EDIT_EXPENSE_API: '',
+        GET_LIMIT_API: '',
+        EDIT_LIMIT_API: '',
         CATEGORIES: [],
     });
 
@@ -30,7 +34,7 @@ export const ConstantProvider: React.FC<{ children: ReactNode }> = ({ children }
         .then((res: ConstantContextType) => {
             setConsts({...res});
             if (Object.keys(initDataUnsafe).length > 0) {
-                setConsts(prev => ({ ...prev, CURRENT_USER: initDataUnsafe['user']['id'] }))
+                setConsts(prev => ({ ...prev, CURRENT_USER: initDataUnsafe['user']['username'] }))
             }
         });
     }, []);

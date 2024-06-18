@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
-import { BudgetEditItem, BudgetItem, BudgetItemsOverview } from "@/types";
+import { BudgetEditItem, BudgetItem, BudgetItemsOverview, BudgetLimit } from "@/types";
 import moment from "moment";
 import { sortBy } from "@/utils/global";
 import { useConstant } from "./ConstantContext";
@@ -10,37 +10,53 @@ interface BudgetContextType {
     budgetItems: BudgetItem[]
     budgetOverview: BudgetItemsOverview[]
     editingItem?: BudgetItem | BudgetEditItem
+    budgetLimit: string
+    totalBudget: string
     processForm: (item: BudgetItem | BudgetEditItem) => Promise<void>
     loadData: (yearMonth: string) => void,
     setSelectedYearMonth: (YM: string) => void
     setEditingItem?: (value: BudgetItem | BudgetEditItem | undefined) => void
+    loadBudgetLimit: () => void,
 }
 
 const BudgetContext = createContext<BudgetContextType | undefined>(undefined);
 
 export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const { API_URL, CURRENT_USER, GET_EXPENSE_API, EDIT_EXPENSE_API, ADD_EXPENSE_API } = useConstant();
+    const {
+        API_URL,
+        CURRENT_USER,
+        GET_EXPENSE_API,
+        EDIT_EXPENSE_API,
+        ADD_EXPENSE_API,
+        GET_LIMIT_API 
+    } = useConstant();
 
     const [isLoading, setIsLoading] = useState(true);
     const [budgetItems, setBudgetItems] = useState<BudgetItem[]>([]);
     const [budgetOverview, setBudgetOverview] = useState<BudgetItemsOverview[]>([]);
     const [selectedYearMonth, setSelectedYearMonth] = useState(moment().format('YYYY-MM'));
+    const [budgetLimit, setBudgetLimit] = useState('0');
+    const [totalBudgetMonth, setTotalBudgetMonth] = useState('0');
 
     const [editingItem, setEditingItem] = useState<BudgetItem | BudgetEditItem | undefined>(undefined);
 
     const loadData = (yearMonth?: string) => {
         return new Promise<void>((resolve, _) => {
-            setIsLoading(true);
+            if (!isLoading) {
+                setIsLoading(true);
+            }
             if (yearMonth == null) {
                 yearMonth = selectedYearMonth
             }
+
+            const currentMonthAndYear = moment().format('YYYY-MM');
             fetch(`${API_URL}/${GET_EXPENSE_API}?date=${moment(yearMonth, 'YYYY-MM').format('YYYY-MM-01')}&userID=${CURRENT_USER}`)
             .then(res => res.json())
             .then((data: any) => {
-                data = data.map((d: any) => {
-                    d.amount = parseFloat(d.amount);
-                    return d;
-                });
+                if (selectedYearMonth == currentMonthAndYear) {
+                    const total = data.reduce((acc: number, current: any) => acc + parseFloat(current.amount), 0);
+                    setTotalBudgetMonth(total.toString());
+                }
     
                 const overview = buildOverview(data);
     
@@ -52,9 +68,22 @@ export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         })
     }
 
+    const loadBudgetLimit = () => {
+        return new Promise<void>((resolve, _) => {
+            fetch(`${API_URL}/${GET_LIMIT_API}?userID=${CURRENT_USER}`)
+            .then(res => res.json())
+            .then((result: BudgetLimit) => {
+                setBudgetLimit(result.amount);
+                resolve();
+            })
+        });
+    }
+
     useEffect(() => {
         if (API_URL != '') {
-            loadData();
+            setIsLoading(true)
+            Promise.all([loadData(), loadBudgetLimit()])
+            .then(_ => {setIsLoading(false)});
         }
     }, [API_URL]);
 
@@ -140,10 +169,13 @@ export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             budgetItems,
             budgetOverview,
             editingItem,
+            budgetLimit,
+            totalBudget: totalBudgetMonth,
             setSelectedYearMonth,
             processForm,
             loadData,
-            setEditingItem
+            setEditingItem,
+            loadBudgetLimit
         }}>
             {children}
         </BudgetContext.Provider>

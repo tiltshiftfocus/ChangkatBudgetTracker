@@ -40,7 +40,7 @@ const BudgetList: React.FC<BudgetListProps> = ({ onItemClick }) => {
 												onClick={() => onItemClick(d)}
 											>
 												<span>{d.category}</span>
-												<span className="text-lg font-bold">${d.amount.toFixed(2)}</span>
+												<span className="text-lg font-bold">${parseFloat(d.amount).toFixed(2)}</span>
 											</div>
 										)
 									}

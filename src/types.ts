@@ -1,7 +1,12 @@
+export interface BudgetLimit {
+    amount: string
+    userID: string
+}
+
 export interface BudgetItem {
     id: number
     category: string
-    amount: number
+    amount: string
     date: string
     userID: string
     expenseID: string

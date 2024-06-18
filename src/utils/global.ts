@@ -26,3 +26,8 @@ export const chartCurrencyTooltip: any = {
         }
     }
 }
+
+export const formatCurrency = (value: number | string) => {
+    return Intl.NumberFormat('en-US', { style: 'currency', currency: 'SGD', currencyDisplay: 'narrowSymbol' })
+        .format(typeof value == 'string' ? parseFloat(value) : value);
+}
