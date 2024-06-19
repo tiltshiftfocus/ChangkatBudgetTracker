@@ -1,4 +1,5 @@
 import BudgetForm from "@/components/BudgetForm";
+import BudgetLimitForm from "@/components/BudgetLimitForm";
 import BudgetList from "@/components/BudgetList";
 import DateSelectTitle from "@/components/DateSelectTitle";
 import { useBudget } from "@/contexts/BudgetContext";
@@ -9,13 +10,15 @@ import React, { useMemo, useRef, useState } from 'react';
 
 const BudgetItemsHome: React.FC = () => {
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const { setEditingItem, budgetLimit, totalBudget } = useBudget();
+    const { isLoading, setEditingItem, budgetLimit, totalBudget } = useBudget();
     
     const formModal = useRef<HTMLDialogElement | null>(null);
     const showForm = () => {
         formModal.current?.showModal();
         setIsFormOpen(true);
     }
+
+    const budgetLimitModal = useRef<HTMLDialogElement | null>(null);
 
     const onItemClick = (item: BudgetItem) => {
         setEditingItem != undefined && setEditingItem({ ...item });
@@ -54,11 +57,32 @@ const BudgetItemsHome: React.FC = () => {
                 <div className="w-full max-w-screen-md">
                     {
                         <div className="flex flex-col justify-between items-center gap-2 border border-blue-800 border-opacity-30 rounded-lg px-5 py-3 mb-2 bg-white dark:bg-gray-800">
-                            <span className="my-10">
-                                You have spent <span className="font-bold">{ formatCurrency(totalBudget) }</span> out of { formatCurrency(budgetLimit) }.
-                            </span>
-                            <progress className={`progress ${budgetSoFar.progressClass} w-full`} value={budgetSoFar.value} max="100"></progress>
+                            {
+                                !isLoading && parseInt(budgetLimit) > 0 &&
+                                <>
+                                <span className="mt-10 mb-5 text-center">
+                                    You have spent <span className="font-bold">{ formatCurrency(totalBudget) }</span> out of { formatCurrency(budgetLimit) }.
+                                </span>
+                                <progress className={`mb-10 progress ${budgetSoFar.progressClass} sm:w-96 w-48`} value={budgetSoFar.value} max="100"></progress>
+                                </>
+                            }
+                            {
+                                !isLoading && parseInt(budgetLimit) == 0 &&
+                                <small className="mt-10 mb-5 text-center">
+                                    You have not set a budget limit. Click below to set one.
+                                </small>
+                            }
+                            {
+                                isLoading &&
+                                <span className="loading loading-spinner loading-md"></span>
+                            }
+                            <div className="flex justify-end w-full">
+                                <small className="cursor-pointer" onClick={() => budgetLimitModal.current?.show()}>Set/Edit Limit</small>
+                            </div>
                         </div>
+                    }
+                    {
+                        
                     }
                     <DateSelectTitle title="Items"/>
                     <BudgetList onItemClick={onItemClick} />
@@ -79,6 +103,17 @@ const BudgetItemsHome: React.FC = () => {
                     </form>
                     <div className="mt-4">
                         <BudgetForm isFormOpen={isFormOpen} onComplete={() => formModal.current?.close()}/>
+                    </div>
+                </div>
+            </dialog>
+            <dialog ref={budgetLimitModal} className="modal modal-lg">
+                <div className="modal-box w-11/12">
+                    <form method="dialog" className="flex justify-between items-center">
+                        <h5 className="text-xl">Edit Budget Limit</h5>
+                        <button className="btn btn-sm btn-circle btn-ghost">✕</button>
+                    </form>
+                    <div className="mt-4">
+                        <BudgetLimitForm onComplete={() => budgetLimitModal.current?.close()} />
                     </div>
                 </div>
             </dialog>

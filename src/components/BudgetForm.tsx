@@ -15,7 +15,7 @@ const BudgetForm: React.FC<BudgetFormProps> = ({ isFormOpen, onComplete }) => {
     const { CURRENT_USER, CATEGORIES: categories } = useConstant();
 
     const [category, setCategory] = useState(categories[0]);
-    const [amount, setAmount] = useState<number | ''>('');
+    const [amount, setAmount] = useState<string | ''>('');
     const [date, setDate] = useState<string>(moment().format('YYYY-MM-DD'));
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -25,7 +25,7 @@ const BudgetForm: React.FC<BudgetFormProps> = ({ isFormOpen, onComplete }) => {
             let data: BudgetItem | BudgetEditItem = {
                 id: Date.now(),
                 category: category,
-                amount: Number(amount),
+                amount: amount.toString(),
                 date,
                 userID: CURRENT_USER,
                 expenseID: `${moment().unix()}-${CURRENT_USER}`
@@ -35,7 +35,7 @@ const BudgetForm: React.FC<BudgetFormProps> = ({ isFormOpen, onComplete }) => {
             if (editingItem != undefined) {
                 data = {
                     category: category,
-                    amount: Number(amount),
+                    amount: amount.toString(),
                     expenseID: editingItem.expenseID,
                     date: editingItem.date
                 }
@@ -99,7 +99,7 @@ const BudgetForm: React.FC<BudgetFormProps> = ({ isFormOpen, onComplete }) => {
                         className="input input-bordered grow md:flex-1"
                         placeholder="e.g. 6.5"
                         value={amount}
-                        onChange={(e) => setAmount(Number(e.target.value))}
+                        onChange={(e) => setAmount(e.target.value.toString())}
                         required
                     />
                 </label>

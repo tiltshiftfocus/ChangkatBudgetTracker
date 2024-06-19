@@ -17,6 +17,7 @@ interface BudgetContextType {
     setSelectedYearMonth: (YM: string) => void
     setEditingItem?: (value: BudgetItem | BudgetEditItem | undefined) => void
     loadBudgetLimit: () => void,
+    updateBudgetLimit: (limitValue: number) => Promise<void>,
 }
 
 const BudgetContext = createContext<BudgetContextType | undefined>(undefined);
@@ -28,7 +29,8 @@ export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         GET_EXPENSE_API,
         EDIT_EXPENSE_API,
         ADD_EXPENSE_API,
-        GET_LIMIT_API 
+        GET_LIMIT_API,
+        EDIT_LIMIT_API
     } = useConstant();
 
     const [isLoading, setIsLoading] = useState(true);
@@ -75,6 +77,29 @@ export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             .then((result: BudgetLimit) => {
                 setBudgetLimit(result.amount);
                 resolve();
+            })
+        });
+    }
+
+    const updateBudgetLimit = (limitValue: number) => {
+        return new Promise<void>((resolve, reject) => {
+            const postItem = {
+                userID: CURRENT_USER,
+                amount: limitValue.toString()
+            };
+    
+            const headers = {
+                'Content-Type': 'application/json'
+            }
+            fetch(`${API_URL}/${EDIT_LIMIT_API}`, { headers, method: 'POST', body: JSON.stringify(postItem) })
+            .then(res => res.json())
+            .then(result => {
+                if (result['ResponseMetadata']['HTTPStatusCode'] == 200) {
+                    setBudgetLimit(limitValue.toString());
+                    resolve();
+                } else {
+                    reject();
+                }
             })
         });
     }
@@ -175,7 +200,8 @@ export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             processForm,
             loadData,
             setEditingItem,
-            loadBudgetLimit
+            loadBudgetLimit,
+            updateBudgetLimit
         }}>
             {children}
         </BudgetContext.Provider>

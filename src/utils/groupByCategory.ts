@@ -8,9 +8,9 @@ export const groupByCategory = (budgetItems: BudgetItem[]) => {
 
   budgetItems.forEach(item => {
     if (groupedData[item.category]) {
-      groupedData[item.category] += item.amount;
+      groupedData[item.category] += parseFloat(item.amount);
     } else {
-      groupedData[item.category] = item.amount;
+      groupedData[item.category] = parseFloat(item.amount);
     }
   });
 
