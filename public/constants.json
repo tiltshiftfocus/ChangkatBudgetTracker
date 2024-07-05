@@ -1,7 +1,7 @@
 {
     "API_URL": "",
     "CURRENT_USER": "test_user_1",
-    "GET_EXPENSE_API": "ChangkatBudgetingMonthlyExpense",
+    "GET_EXPENSE_API": "ChangkatBudgetingViewExpense",
     "ADD_EXPENSE_API": "ChangkatBudgetingAddExpense",
     "EDIT_EXPENSE_API": "ChangkatBudgetingEditExpense",
     "GET_LIMIT_API": "ChangkatBudgetingReadLimits",
