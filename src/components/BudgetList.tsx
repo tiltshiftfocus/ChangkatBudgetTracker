@@ -14,6 +14,10 @@ const BudgetList: React.FC<BudgetListProps> = ({ onItemClick }) => {
 		budgetOverview,
 	} = useBudget();
 
+	const calculateTotalDay = (group: BudgetItemsOverview) => {
+		return group.items.reduce((acc: number, current: any) => acc + parseFloat(current.amount), 0);
+	}
+
 	return (
 		<>
 			<div className="border border-blue-800 border-opacity-30 rounded-lg p-3 shadow-md bg-white dark:bg-gray-800 mb-24">
@@ -27,8 +31,11 @@ const BudgetList: React.FC<BudgetListProps> = ({ onItemClick }) => {
 					!isLoading && budgetOverview.length > 0 && budgetOverview.map((budgetGroup: BudgetItemsOverview, index: number) => (
 						<React.Fragment key={`overview_${index}`}>
 							<div tabIndex={index} className="collapse-open">
-								<div className="collapse-title font-bold">
-									{moment(budgetGroup.date, 'YYYY-MM-DD').format('MMM DD, YYYY')}
+								<div className="collapse-title flex justify-between" style={{paddingInlineEnd: 'unset', paddingRight: '1rem'}}>
+									<span className="font-bold">
+										{moment(budgetGroup.date, 'YYYY-MM-DD').format('MMM DD, YYYY')}
+									</span>
+									<small className="text-gray-400">${calculateTotalDay(budgetGroup).toFixed(2)}</small>
 								</div>
 								<div className="collapse-content">
 									{
