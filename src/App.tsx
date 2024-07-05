@@ -24,7 +24,7 @@ const App = () => {
 		return (
 			<Router>
 				<div className="h-screen flex flex-col bg-gray-200 dark:bg-gray-800">
-					<nav className="bg-blue-600 p-4 text-white">
+					<nav className="bg-blue-600 dark:bg-slate-700 p-4 text-white">
 						<div className="container mx-auto flex justify-between">
 							<Link to="/" className="font-bold">Budget Items</Link>
 							<Link to="/budget-overview" className="font-bold" >Overview</Link>
