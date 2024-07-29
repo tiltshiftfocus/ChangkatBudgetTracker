@@ -34,7 +34,7 @@ export const ConstantProvider: React.FC<{ children: ReactNode }> = ({ children }
         .then((res: ConstantContextType) => {
             setConsts({...res});
             if (Object.keys(initDataUnsafe).length > 0) {
-                setConsts(prev => ({ ...prev, CURRENT_USER: initDataUnsafe['user']['username'] }))
+                setConsts(prev => ({ ...prev, CURRENT_USER: initDataUnsafe['user']['id'] }))
             }
         });
     }, []);
